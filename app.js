@@ -17,12 +17,38 @@ var api = axios.create({
     }
 })
 
-function replyText(replyToken,coinName,coinPrice,coinUnit) {
+function replyText(replyToken,text) {
     let replyData = {
         replyToken: replyToken,
         messages: [{
             type: 'text',
             text: coinName + ' : ' + coinPrice + ' ' + coinUnit
+        }]
+    }
+    api.post('/message/reply', replyData)
+        .then((res) => {
+            console.log("reply success")
+        })
+        .catch((error) => {
+            console.log("reply error")
+        })
+}
+
+function replyCoin(replyToken,coinList) {
+    var replyText = ""
+    if(coinList.lenth == 0){
+        replyText = "Coin not found!"
+    }
+    else{
+        coinList.map((coin)=>{
+            replyText += coin.coinName + ' : ' + coin.oinPrice + ' ' + coin.coinUnit + '\n'
+        })
+    }
+    let replyData = {
+        replyToken: replyToken,
+        messages: [{
+            type: 'text',
+            text: replyText
         }]
     }
     api.post('/message/reply', replyData)
@@ -45,14 +71,16 @@ function analyzeText(message) {
 function getBXCurrency(replyToken,currency) {
     axios.get('https://bx.in.th/api/')
         .then((res) => {
+            var resultList = []
             Object.entries(res.data).forEach(([coin_id,coin])=>{
                 let coinName = coin.secondary_currency
                 let coinUnit = coin.primary_currency
                 if(coinName == currency){
                     let coinPrice = coin.last_price
-                    replyText(replyToken,coinName,coinPrice,coinUnit);
+                    resultList.append({coinName : coinName,coinPrice:coinPrice,coinUnit:coinUnit})
                 }
             })
+            replyCoin(replyToken,resultList);
         })
         .catch((error) => {
             console.log(error)
@@ -73,3 +101,6 @@ app.get('/getBX',(req,res)=>{
 app.listen(app.get('port'), function () {
     console.log('LINE WEBHOOK RUN AT PORT', app.get('port'))
 })
+
+//TODO: multiple answer for same currency (diff primary currency)
+//TODO: multiple market, bx, coinmarketcaps
