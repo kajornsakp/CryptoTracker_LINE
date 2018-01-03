@@ -36,14 +36,17 @@ function replyText(replyToken,text) {
 
 function replyCoin(replyToken,coinList) {
     var replyText = ""
+    console.log(coinList)
     if(coinList.lenth == 0){
         replyText = "Coin not found!"
     }
     else{
-        coinList.map((coin)=>{
-            replyText += coin.coinName + ' : ' + coin.oinPrice + ' ' + coin.coinUnit + '\n'
-        })
+        for (var coin of coinList){
+            console.log("coin " + coin)
+            replyText += coin.coinName + ' : ' + coin.coinPrice + ' ' + coin.coinUnit + '\n'
+        }
     }
+    console.log(replyText)
     let replyData = {
         replyToken: replyToken,
         messages: [{
@@ -51,6 +54,7 @@ function replyCoin(replyToken,coinList) {
             text: replyText
         }]
     }
+
     api.post('/message/reply', replyData)
         .then((res) => {
             console.log("reply success")
@@ -71,13 +75,16 @@ function analyzeText(message) {
 function getBXCurrency(replyToken,currency) {
     axios.get('https://bx.in.th/api/')
         .then((res) => {
-            var resultList = []
+            var resultList = new Array()
             Object.entries(res.data).forEach(([coin_id,coin])=>{
                 let coinName = coin.secondary_currency
                 let coinUnit = coin.primary_currency
                 if(coinName == currency){
+                    console.log(currency + " " + coinName)
                     let coinPrice = coin.last_price
-                    resultList += {coinName : coinName,coinPrice:coinPrice,coinUnit:coinUnit}
+                    var coin = {coinName : coinName,coinPrice:coinPrice,coinUnit:coinUnit}
+                    console.log(typeof resultList)
+                    resultList.push(coin)
                 }
             })
             replyCoin(replyToken,resultList);
@@ -94,7 +101,7 @@ app.post('/webhook', (req, res) => {
 })
 
 app.get('/getBX',(req,res)=>{
-    getBXCurrency()
+    getBXCurrency("a","ETH")
     res.sendStatus(200)
 })
 
