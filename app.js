@@ -77,7 +77,7 @@ function getBXCurrency(replyToken,currency) {
                 let coinUnit = coin.primary_currency
                 if(coinName == currency){
                     let coinPrice = coin.last_price
-                    resultList.append({coinName : coinName,coinPrice:coinPrice,coinUnit:coinUnit})
+                    resultList += {coinName : coinName,coinPrice:coinPrice,coinUnit:coinUnit}
                 }
             })
             replyCoin(replyToken,resultList);
