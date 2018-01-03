@@ -2,7 +2,9 @@
   "name": "CryptoTracker_LINE",
   "version": "0.0.0",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "start":"node app.js"
+  },
   "dependencies": {
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
